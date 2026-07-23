@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from .palette import ACCENT, GRAY, GRAY_DARK, GRAY_MID
-from .theme import style_context
+from .theme import stamp_fonts, style_context
 
 
 def _series_to_groups(data, column, by):
@@ -205,6 +205,11 @@ def boxplot(
 
         if title is not None:
             target_ax.set_title(title)
+
+        # Pin the theme font onto the labels we just created so non-Latin text
+        # (e.g. Chinese) survives to draw time instead of reverting to the
+        # default font and rendering as tofu boxes.
+        stamp_fonts(target_ax)
         return target_ax
 
     # Only wrap figure creation in the theme so we never mutate a user's global

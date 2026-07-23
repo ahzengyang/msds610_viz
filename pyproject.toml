@@ -28,3 +28,6 @@ Repository = "https://github.com/ahzengyang/msds610_viz"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+cleanplot = ["*.mplstyle"]

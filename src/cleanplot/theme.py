@@ -1,80 +1,89 @@
 """The cleanplot default theme.
 
-The theme is expressed as a plain dict of matplotlib ``rcParams``. It strips
+The theme is defined in a matplotlib style sheet, ``cleanplot.mplstyle``, which
+ships alongside this module and is the single source of truth. It strips
 matplotlib's default clutter (top/right spines, heavy gridlines, long tick
-marks), sets generous, legible typography, and installs the colorblind-safe
-categorical palette as the default color cycle.
+marks), sets generous, legible typography, installs the colorblind-safe
+categorical palette as the color cycle, and configures a CJK-capable font
+fallback so Chinese (and other non-Latin) text renders instead of blank boxes.
 
-Two ways to use it:
+Three ways to use it:
 
+* ``plt.style.use("cleanplot")`` — the plain-matplotlib way. Importing
+  ``cleanplot`` registers the style under this name.
 * ``style_context()`` — a context manager that applies the theme only for the
   block it wraps. cleanplot's own chart helpers use this internally, so they
   never mutate your global matplotlib state unexpectedly.
 * ``apply_style()`` — opt in globally for a whole session/script. Reversible
-  with matplotlib's own ``matplotlib.rcdefaults()`` or ``style_context``.
+  with matplotlib's own ``matplotlib.rcdefaults()``.
 """
 
+from pathlib import Path
+
 import matplotlib as mpl
+from matplotlib import style as _mpl_style
 
-from .palette import CATEGORICAL, GRAY_DARK, GRAY_LIGHT
+#: Path to the shipped style sheet.
+STYLE_PATH = Path(__file__).with_name("cleanplot.mplstyle")
 
-#: The theme as matplotlib rcParams. Exposed so users can inspect or tweak it.
-RC_PARAMS = {
-    # --- figure -------------------------------------------------------------
-    "figure.figsize": (8.0, 5.0),
-    "figure.dpi": 110,
-    "figure.facecolor": "white",
-    "savefig.dpi": 200,
-    "savefig.bbox": "tight",
-    "savefig.facecolor": "white",
+#: The theme as matplotlib rcParams, loaded from the style sheet. Exposed so
+#: users can inspect or tweak it. ``use_default_template=False`` keeps only the
+#: keys the style sheet actually sets.
+RC_PARAMS = mpl.rc_params_from_file(STYLE_PATH, use_default_template=False)
 
-    # --- typography ---------------------------------------------------------
-    "font.size": 11,
-    "axes.titlesize": 14,
-    "axes.labelsize": 11.5,
-    "xtick.labelsize": 10,
-    "ytick.labelsize": 10,
-    "legend.fontsize": 10,
+#: The name the style is registered under for ``plt.style.use``.
+STYLE_NAME = "cleanplot"
 
-    # --- color cycle --------------------------------------------------------
-    "axes.prop_cycle": mpl.cycler(color=CATEGORICAL),
 
-    # --- data-ink: spines ---------------------------------------------------
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-    "axes.edgecolor": GRAY_DARK,
-    "axes.linewidth": 0.8,
+def _register_style():
+    """Register the theme in matplotlib's style library as ``cleanplot``.
 
-    # --- data-ink: title / label placement ----------------------------------
-    "axes.titlelocation": "left",
-    "axes.titlepad": 12.0,
-    "axes.titleweight": "bold",
-    "axes.labelpad": 6.0,
-    "axes.labelcolor": GRAY_DARK,
-    "text.color": GRAY_DARK,
+    Makes ``plt.style.use("cleanplot")`` work without knowing the file path.
+    Best-effort and idempotent; safe to call more than once.
+    """
+    try:
+        _mpl_style.library[STYLE_NAME] = dict(RC_PARAMS)
+        # Keep the public ``available`` list in sync.
+        if STYLE_NAME not in _mpl_style.available:
+            _mpl_style.available.append(STYLE_NAME)
+            _mpl_style.available.sort()
+    except Exception:
+        # If matplotlib's internals change, fall back to path-based use; the
+        # rest of cleanplot still works via style_context()/apply_style().
+        pass
 
-    # --- data-ink: gridlines (light, y-only, behind the data) ---------------
-    "axes.grid": True,
-    "axes.grid.axis": "y",
-    "axes.axisbelow": True,
-    "grid.color": GRAY_LIGHT,
-    "grid.linewidth": 0.8,
-    "grid.linestyle": "-",
 
-    # --- data-ink: ticks (short, thin, muted) -------------------------------
-    "xtick.color": GRAY_DARK,
-    "ytick.color": GRAY_DARK,
-    "xtick.major.size": 0.0,
-    "ytick.major.size": 0.0,
-    "xtick.major.width": 0.8,
-    "ytick.major.width": 0.8,
-    "xtick.major.pad": 6.0,
-    "ytick.major.pad": 6.0,
+_register_style()
 
-    # --- legend -------------------------------------------------------------
-    "legend.frameon": False,
-    "legend.borderaxespad": 0.0,
-}
+
+def stamp_fonts(ax):
+    """Pin the theme's font family onto the text artists of ``ax``.
+
+    Font resolution happens at *draw* time, not when text is created. Because
+    cleanplot's helpers style within a temporary rcParams context that has been
+    exited by the time the user calls ``savefig``, the theme's CJK-capable font
+    fallback would otherwise be lost and non-Latin text (e.g. Chinese) would
+    render as blank "tofu" boxes. Stamping the font family directly on the Text
+    artists makes it stick, and preserves matplotlib's per-glyph fallback so
+    Latin text still renders normally.
+    """
+    fam = RC_PARAMS.get("font.sans-serif")
+    if not fam:
+        return
+    fam = list(fam)
+    texts = [ax.xaxis.label, ax.yaxis.label]
+    # Titles: with titlelocation="left" the text lives on the left title slot,
+    # not the centered ax.title, so stamp all three defensively.
+    for attr in ("title", "_left_title", "_right_title"):
+        title = getattr(ax, attr, None)
+        if title is not None:
+            texts.append(title)
+    texts += list(ax.get_xticklabels()) + list(ax.get_yticklabels())
+    legend = ax.get_legend()
+    if legend is not None:
+        texts += list(legend.get_texts())
+    for text in texts:
+        text.set_fontfamily(fam)
 
 
 def style_context(overrides=None):
@@ -88,7 +97,7 @@ def style_context(overrides=None):
     Examples
     --------
     >>> import matplotlib.pyplot as plt
-    >>> from cleanplot.theme import style_context
+    >>> from cleanplot import style_context
     >>> with style_context():
     ...     fig, ax = plt.subplots()
     ...     ax.plot([0, 1], [0, 1])

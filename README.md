@@ -23,6 +23,9 @@ out clear and honest:
 - **Encode for perception** — favor position/length; use one accent color
   against muted grays instead of a rainbow.
 - **Colorblind-safe by default** — the categorical palette is the Okabe-Ito set.
+- **Reads Chinese (and other non-Latin) text** — the theme ships a CJK-capable
+  font fallback and disables the broken minus glyph, so labels render instead of
+  blank "tofu" boxes.
 - **Honest by default** — sensible axes; nothing gimmicky like gratuitous 3D.
 - **Composable** — helpers accept an optional `ax=` and return the `Axes`; the
   theme is applied in a scoped context, not by silently mutating global state.
@@ -79,31 +82,54 @@ df = pd.DataFrame({"control": [...], "treatment": [...]})
 ax = cp.boxplot(df)          # one box per column, labeled by column name
 ```
 
+### Chinese / non-Latin labels
+
+No extra setup — Chinese column names, titles, and categories just render:
+
+```python
+import pandas as pd
+import cleanplot as cp
+
+df = pd.DataFrame({"班级": [...], "考试成绩": [...]})
+ax = cp.boxplot(df, column="考试成绩", by="班级", title="各班级考试成绩分布")
+```
+
+The theme lists common CJK fonts across macOS / Windows / Linux (PingFang SC,
+Microsoft YaHei, WenQuanYi Zen Hei, Noto Sans CJK, …) and uses the first one
+installed, so this works out of the box on a typical system.
+
 ### Applying the theme to your own matplotlib code
 
-The theme isn't only for cleanplot's helpers. Use it as a scoped context, or
-opt in globally:
+The theme isn't only for cleanplot's helpers. Use it three ways:
 
 ```python
 import matplotlib.pyplot as plt
-import cleanplot as cp
+import cleanplot as cp   # importing registers the "cleanplot" style
 
-# Scoped: only this block is themed.
+# 1) The plain-matplotlib way — apply the named style.
+plt.style.use("cleanplot")
+
+# 2) Scoped: only this block is themed.
 with cp.style_context():
     fig, ax = plt.subplots()
     ax.plot([0, 1, 2], [0, 1, 4])
 
-# Or globally for a whole script (reversible via matplotlib.rcdefaults()).
+# 3) Globally for a whole script (reversible via matplotlib.rcdefaults()).
 cp.apply_style()
 ```
+
+The theme itself is a plain matplotlib style sheet
+(`src/cleanplot/cleanplot.mplstyle`), so it's easy to read and tweak.
 
 ## API (MVP)
 
 | Function | Purpose |
 | --- | --- |
 | `boxplot(data, column=None, by=None, *, ax=None, orient=..., highlight=..., ...)` | Self-labeling box plot from a DataFrame/Series; returns `Axes`. |
+| `plt.style.use("cleanplot")` | Apply the theme the plain-matplotlib way (registered on import). |
 | `apply_style(overrides=None)` | Apply the cleanplot theme to global matplotlib rcParams. |
 | `style_context(overrides=None)` | Context manager applying the theme temporarily. |
+| `STYLE_PATH` | Path to the shipped `cleanplot.mplstyle` style sheet. |
 | `categorical(n=None)` | The colorblind-safe categorical palette (cycled to `n`). |
 | `RC_PARAMS` | The theme as a plain rcParams dict, for inspection/tweaking. |
 
@@ -113,7 +139,8 @@ cp.apply_style()
 msds610_viz/
 ├── src/cleanplot/        # the library
 │   ├── __init__.py       # public API
-│   ├── theme.py          # default theme (rcParams) + style helpers
+│   ├── cleanplot.mplstyle # the theme as a matplotlib style sheet (source of truth)
+│   ├── theme.py          # loads + registers the theme; style helpers
 │   ├── palette.py        # colorblind-safe palette
 │   └── boxplot.py        # the boxplot helper
 ├── data/

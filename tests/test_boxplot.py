@@ -73,6 +73,32 @@ def test_horizontal_orientation():
     plt.close(ax.figure)
 
 
+def test_named_style_registered():
+    # Importing cleanplot registers the theme under a name for plt.style.use.
+    assert cp.STYLE_NAME in plt.style.available
+    assert cp.STYLE_PATH.exists()
+
+
+def test_cjk_font_stamped_on_labels():
+    # The theme font (with CJK fallback) must be pinned onto the text artists
+    # so Chinese labels survive to draw time instead of reverting to a
+    # Latin-only default font.
+    df = pd.DataFrame({"班级": ["甲", "甲", "乙", "乙"], "成绩": [1.0, 2.0, 3.0, 4.0]})
+    ax = cp.boxplot(df, column="成绩", by="班级", title="标题")
+    expected = list(cp.RC_PARAMS["font.sans-serif"])
+    for label in (ax.xaxis.label, ax.yaxis.label):
+        assert list(label.get_fontfamily()) == expected
+    # Title (left-located) must be stamped too.
+    left_title = getattr(ax, "_left_title", None) or ax.title
+    assert list(left_title.get_fontfamily()) == expected
+    plt.close(ax.figure)
+
+
+def test_unicode_minus_disabled_in_theme():
+    # CJK fonts often lack a proper minus glyph; the theme uses ASCII hyphen.
+    assert cp.RC_PARAMS["axes.unicode_minus"] is False
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):

@@ -14,7 +14,13 @@ Quick start
 
 from .boxplot import boxplot
 from .palette import CATEGORICAL, SEQUENTIAL, categorical
-from .theme import RC_PARAMS, apply_style, style_context
+from .theme import (
+    RC_PARAMS,
+    STYLE_NAME,
+    STYLE_PATH,
+    apply_style,
+    style_context,
+)
 
 __version__ = "0.1.0"
 
@@ -23,6 +29,8 @@ __all__ = [
     "apply_style",
     "style_context",
     "RC_PARAMS",
+    "STYLE_NAME",
+    "STYLE_PATH",
     "CATEGORICAL",
     "SEQUENTIAL",
     "categorical",
