@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cleanplot"
+version = "0.1.0"
+description = "Clean, honest matplotlib charts from pandas, by default."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "ahzengyang" }]
+keywords = ["matplotlib", "pandas", "visualization", "charts", "theme"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+    "pandas>=1.3",
+    "matplotlib>=3.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/ahzengyang/msds610_viz"
+Repository = "https://github.com/ahzengyang/msds610_viz"
+
+[tool.setuptools.packages.find]
+where = ["src"]
