@@ -152,6 +152,11 @@ top/right spines, light grid, legible type) — only the palette and surfaces
 change: a warm 宣纸 (rice-paper) background, 墨 (ink) text, and a color cycle of
 traditional Chinese colors (中国红 · 靛青 · 竹青 · 藤黄 · 黛紫 · 赭石 · 天青 · 墨).
 
+![Chinese theme box plot](examples/theme_chinese.png)
+
+See `examples/theme_demo.py` for the default-vs-chinese comparison that produced
+this.
+
 ## API (MVP)
 
 | Function | Purpose |
