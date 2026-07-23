@@ -16,8 +16,8 @@ humans perceive" philosophy well. This helper:
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from .palette import ACCENT, GRAY, GRAY_DARK, GRAY_MID
-from .theme import stamp_fonts, style_context
+from .palette import theme_colors
+from .theme import DEFAULT_THEME, stamp_fonts, style_context
 
 
 def _series_to_groups(data, column, by):
@@ -83,6 +83,7 @@ def boxplot(
     by=None,
     *,
     ax=None,
+    theme=DEFAULT_THEME,
     orient="vertical",
     accent=None,
     highlight=None,
@@ -107,12 +108,15 @@ def boxplot(
         Column to group by (long form). One box is drawn per distinct value.
     ax : matplotlib.axes.Axes, optional
         Axes to draw into. If ``None``, a new figure and axes are created using
-        the cleanplot theme.
+        the selected theme.
+    theme : str, default "cleanplot"
+        Theme name driving the muted/accent colors and (when creating a new
+        figure) the styling: ``"cleanplot"`` or ``"chinese"``.
     orient : {"vertical", "horizontal"}, default "vertical"
         Box orientation.
     accent : str, optional
         Accent color for the highlighted box (see ``highlight``). Defaults to
-        cleanplot's accent color when ``highlight`` is given.
+        the theme's accent color when ``highlight`` is given.
     highlight : str or int, optional
         A group label or positional index to emphasize with the accent color
         while the rest stay muted gray. Directs the eye with contrast.
@@ -143,7 +147,11 @@ def boxplot(
 
     labels, values, value_name, group_name = _series_to_groups(data, column, by)
     vertical = orient == "vertical"
-    base_color = color if color is not None else GRAY
+
+    # Theme-driven colors: muted neutral fill, one accent, ink/mid line colors.
+    colors = theme_colors(theme)
+    ink, mid = colors["ink"], colors["mid"]
+    base_color = color if color is not None else colors["neutral"]
 
     # Resolve which box (if any) to highlight, by label or index.
     hi_index = None
@@ -153,7 +161,7 @@ def boxplot(
                 hi_index = highlight % len(labels)
         elif str(highlight) in labels:
             hi_index = labels.index(str(highlight))
-    hi_color = accent if accent is not None else ACCENT
+    hi_color = accent if accent is not None else colors["accent"]
 
     def _draw(target_ax):
         bp = target_ax.boxplot(
@@ -163,13 +171,13 @@ def boxplot(
             patch_artist=True,          # filled boxes so we can color them
             widths=0.6,
             showfliers=showfliers,
-            medianprops={"color": GRAY_DARK, "linewidth": 1.6},
-            whiskerprops={"color": GRAY_MID, "linewidth": 1.0},
-            capprops={"color": GRAY_MID, "linewidth": 1.0},
+            medianprops={"color": ink, "linewidth": 1.6},
+            whiskerprops={"color": mid, "linewidth": 1.0},
+            capprops={"color": mid, "linewidth": 1.0},
             flierprops={
                 "marker": "o",
                 "markersize": 3,
-                "markerfacecolor": GRAY_MID,
+                "markerfacecolor": mid,
                 "markeredgecolor": "none",
                 "alpha": 0.6,
             },
@@ -179,7 +187,7 @@ def boxplot(
         for i, patch in enumerate(bp["boxes"]):
             emphasized = i == hi_index
             patch.set_facecolor(hi_color if emphasized else base_color)
-            patch.set_edgecolor(GRAY_DARK if emphasized else GRAY_MID)
+            patch.set_edgecolor(ink if emphasized else mid)
             patch.set_linewidth(1.2 if emphasized else 1.0)
             patch.set_alpha(1.0 if emphasized else 0.9)
 
@@ -209,13 +217,13 @@ def boxplot(
         # Pin the theme font onto the labels we just created so non-Latin text
         # (e.g. Chinese) survives to draw time instead of reverting to the
         # default font and rendering as tofu boxes.
-        stamp_fonts(target_ax)
+        stamp_fonts(target_ax, theme)
         return target_ax
 
     # Only wrap figure creation in the theme so we never mutate a user's global
     # state or restyle axes they passed in.
     if ax is None:
-        with style_context():
+        with style_context(theme):
             _fig, ax = plt.subplots()
             _draw(ax)
     else:

@@ -22,9 +22,12 @@ out clear and honest:
   ticks, give type room to breathe.
 - **Encode for perception** — favor position/length; use one accent color
   against muted grays instead of a rainbow.
-- **Colorblind-safe by default** — the categorical palette is the Okabe-Ito set.
-- **Reads Chinese (and other non-Latin) text** — the theme ships a CJK-capable
-  font fallback and disables the broken minus glyph, so labels render instead of
+- **Colorblind-safe by default** — the default categorical palette is the
+  Okabe-Ito set.
+- **Themed** — a clean minimal default, plus a traditional Chinese (中国风)
+  ink-and-paper theme; pick one per chart with `theme=` or globally.
+- **Reads Chinese (and other non-Latin) text** — themes ship a CJK-capable
+  font fallback and disable the broken minus glyph, so labels render instead of
   blank "tofu" boxes.
 - **Honest by default** — sensible axes; nothing gimmicky like gratuitous 3D.
 - **Composable** — helpers accept an optional `ax=` and return the `Axes`; the
@@ -121,14 +124,42 @@ cp.apply_style()
 The theme itself is a plain matplotlib style sheet
 (`src/cleanplot/cleanplot.mplstyle`), so it's easy to read and tweak.
 
+### Themes
+
+Two themes ship with cleanplot:
+
+| Theme | Look | `plt.style.use(...)` | Palette |
+| --- | --- | --- | --- |
+| `"cleanplot"` (default) | Clean, minimal, colorblind-safe | `"cleanplot"` | Okabe-Ito |
+| `"chinese"` (中国风) | Traditional ink-and-paper aesthetic | `"cleanplot-chinese"` | Traditional Chinese colors, china-red accent |
+
+Pick a theme per chart with `theme=`, or apply one globally:
+
+```python
+import cleanplot as cp
+
+# Per-chart: warm rice-paper background, ink type, china-red accent.
+ax = cp.boxplot(df, column="score", by="section",
+                theme="chinese", highlight="Section C")
+
+# Or globally, the plain-matplotlib way:
+import matplotlib.pyplot as plt
+plt.style.use("cleanplot-chinese")
+```
+
+The `"chinese"` theme keeps the same data-ink discipline as the default (no
+top/right spines, light grid, legible type) — only the palette and surfaces
+change: a warm 宣纸 (rice-paper) background, 墨 (ink) text, and a color cycle of
+traditional Chinese colors (中国红 · 靛青 · 竹青 · 藤黄 · 黛紫 · 赭石 · 天青 · 墨).
+
 ## API (MVP)
 
 | Function | Purpose |
 | --- | --- |
-| `boxplot(data, column=None, by=None, *, ax=None, orient=..., highlight=..., ...)` | Self-labeling box plot from a DataFrame/Series; returns `Axes`. |
-| `plt.style.use("cleanplot")` | Apply the theme the plain-matplotlib way (registered on import). |
-| `apply_style(overrides=None)` | Apply the cleanplot theme to global matplotlib rcParams. |
-| `style_context(overrides=None)` | Context manager applying the theme temporarily. |
+| `boxplot(data, column=None, by=None, *, ax=None, theme="cleanplot", orient=..., highlight=..., ...)` | Self-labeling box plot from a DataFrame/Series; returns `Axes`. |
+| `plt.style.use("cleanplot" \| "cleanplot-chinese")` | Apply a theme the plain-matplotlib way (registered on import). |
+| `apply_style(name="cleanplot", overrides=None)` | Apply a theme to global matplotlib rcParams. |
+| `style_context(name="cleanplot", overrides=None)` | Context manager applying a theme temporarily. |
 | `STYLE_PATH` | Path to the shipped `cleanplot.mplstyle` style sheet. |
 | `categorical(n=None)` | The colorblind-safe categorical palette (cycled to `n`). |
 | `RC_PARAMS` | The theme as a plain rcParams dict, for inspection/tweaking. |
@@ -139,8 +170,9 @@ The theme itself is a plain matplotlib style sheet
 msds610_viz/
 ├── src/cleanplot/        # the library
 │   ├── __init__.py       # public API
-│   ├── cleanplot.mplstyle # the theme as a matplotlib style sheet (source of truth)
-│   ├── theme.py          # loads + registers the theme; style helpers
+│   ├── cleanplot.mplstyle # default theme as a matplotlib style sheet
+│   ├── chinese.mplstyle  # "chinese" theme (ink-and-paper aesthetic)
+│   ├── theme.py          # loads + registers themes; style helpers
 │   ├── palette.py        # colorblind-safe palette
 │   └── boxplot.py        # the boxplot helper
 ├── data/

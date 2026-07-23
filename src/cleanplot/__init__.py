@@ -13,13 +13,17 @@ Quick start
 """
 
 from .boxplot import boxplot
-from .palette import CATEGORICAL, SEQUENTIAL, categorical
+from .palette import CATEGORICAL, CHINESE, SEQUENTIAL, categorical, theme_colors
 from .theme import (
+    DEFAULT_THEME,
     RC_PARAMS,
     STYLE_NAME,
     STYLE_PATH,
+    STYLE_PATHS,
+    THEMES,
     apply_style,
     style_context,
+    theme_rc,
 )
 
 __version__ = "0.1.0"
@@ -28,10 +32,16 @@ __all__ = [
     "boxplot",
     "apply_style",
     "style_context",
+    "theme_rc",
+    "theme_colors",
+    "DEFAULT_THEME",
+    "THEMES",
     "RC_PARAMS",
     "STYLE_NAME",
     "STYLE_PATH",
+    "STYLE_PATHS",
     "CATEGORICAL",
+    "CHINESE",
     "SEQUENTIAL",
     "categorical",
     "__version__",

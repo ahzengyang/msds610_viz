@@ -99,6 +99,31 @@ def test_unicode_minus_disabled_in_theme():
     assert cp.RC_PARAMS["axes.unicode_minus"] is False
 
 
+def test_chinese_theme_registered():
+    assert "chinese" in cp.THEMES
+    assert "cleanplot-chinese" in plt.style.available
+
+
+def test_chinese_theme_uses_traditional_accent():
+    # With theme="chinese", the highlighted box should be china red and the
+    # muted boxes the warm stone neutral (not the default gray/blue).
+    from matplotlib.colors import to_rgba
+
+    ax = cp.boxplot(_long_df(), column="score", by="section",
+                    theme="chinese", highlight="y")
+    faces = [tuple(round(c, 4) for c in p.get_facecolor()) for p in ax.patches]
+    china_red = tuple(round(c, 4) for c in to_rgba(cp.CHINESE[0]))
+    assert china_red in faces
+    plt.close(ax.figure)
+
+
+def test_theme_falls_back_for_unknown_name():
+    # An unknown theme name must not raise; it falls back to the default.
+    ax = cp.boxplot(_wide_df(), theme="does-not-exist")
+    assert [t.get_text() for t in ax.get_xticklabels()] == ["A", "B"]
+    plt.close(ax.figure)
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):
