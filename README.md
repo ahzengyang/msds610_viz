@@ -1,41 +1,39 @@
-# cleanplot
+# spotviz
 
-**Clean, honest matplotlib charts from pandas — by default.**
+**Clean, on-brand matplotlib charts from pandas — Spotify-themed, by default.**
 
-`cleanplot` is a thin wrapper over [pandas](https://pandas.pydata.org/) and
+`spotviz` is a thin wrapper over [pandas](https://pandas.pydata.org/) and
 [matplotlib](https://matplotlib.org/). Call one simple function on your
-DataFrame and get a chart that's noticeably more readable than raw matplotlib —
-without configuring anything. It ships a clean default theme, a colorblind-safe
-palette, and self-labeling chart helpers, and it always hands you back the
-matplotlib `Axes` so you can keep customizing.
+DataFrame and get a chart with the recognizable Spotify look — a dark
+`#121212` ground, Spotify Green as the single accent, decluttered and
+honest — without configuring anything. Every helper auto-labels from your
+DataFrame and returns the matplotlib `Axes` so you can keep customizing.
 
 Its only dependencies are **pandas** and **matplotlib**.
 
-## Why
+> An independent, educational project (USF MSDS610). Not affiliated with or
+> endorsed by Spotify; it simply uses Spotify's public brand colors as a theme.
 
-Raw matplotlib defaults are cluttered: boxy spines on all four sides, heavy
-gridlines, cramped labels, and a color cycle that isn't colorblind-safe.
-`cleanplot`'s defaults follow a few principles so that *whatever* you plot comes
-out clear and honest:
+## Why these defaults
 
-- **Maximize data-ink** — drop top/right spines, lighten gridlines, thin the
-  ticks, give type room to breathe.
-- **Encode for perception** — favor position/length; use one accent color
-  against muted grays instead of a rainbow.
-- **Colorblind-safe by default** — the default categorical palette is the
-  Okabe-Ito set.
-- **Themed** — a clean minimal default, plus a traditional Chinese (中国风)
-  ink-and-paper theme; pick one per chart with `theme=` or globally.
-- **Reads Chinese (and other non-Latin) text** — themes ship a CJK-capable
-  font fallback and disable the broken minus glyph, so labels render instead of
-  blank "tofu" boxes.
-- **Honest by default** — sensible axes; nothing gimmicky like gratuitous 3D.
-- **Composable** — helpers accept an optional `ax=` and return the `Axes`; the
-  theme is applied in a scoped context, not by silently mutating global state.
+The defaults encode what data-viz research finds most impactful — viewers judge
+a chart in ~500ms mostly on **color** and **visual complexity** — so the effort
+order is **color → declutter → typography → helpers**:
+
+- **Dark Spotify identity by default** — `#121212` ground, white/gray text,
+  Spotify Green (`#1DB954`) as the *one* accent against muted grays.
+- **Green means emphasis.** Single-series charts rest in green; add
+  `highlight=` and the rest go gray so green marks the thing that matters.
+  Multi-series charts use a separate **colorblind-checked categorical palette**
+  — and green is deliberately kept out of it so it never loses its meaning.
+- **Decluttered** — no top/right spines, no bounding box, subtle low-contrast
+  gridlines behind the data, thin ticks.
+- **Honest** — bars start at zero; marker size scales by **area**, not radius;
+  no 3D, no rainbow maps, no distorted aspect ratios.
+- **Two modes** — analytical (default) and a `presentation=True` report mode
+  (larger type, 16:9, value labels) — plus a `theme="light"` variant for print.
 
 ## Installation
-
-From source (this repo):
 
 ```bash
 git clone https://github.com/ahzengyang/msds610_viz.git
@@ -43,150 +41,99 @@ cd msds610_viz
 pip install -e .
 ```
 
-This installs `cleanplot` along with its dependencies (pandas, matplotlib).
-
-> Eventually this will be published to PyPI as `pip install cleanplot`.
-
 ## Usage
 
-### Box plot from a "long" DataFrame
-
-One box per group, axes labeled automatically from the column names, one group
-highlighted with an accent color:
-
 ```python
 import pandas as pd
-import cleanplot as cp
+import spotviz as sv
 
-df = pd.read_csv("data/section_scores.csv")   # columns: section, score
+genres = pd.read_csv("data/genre_streams.csv")
 
-ax = cp.boxplot(
-    df,
-    column="score",       # the value column
-    by="section",         # one box per distinct value here
-    highlight="Section C",  # accent this box; mute the rest
-    title="Exam scores by section",
-)
+# Bar: highlight one category in green, mute the rest.
+ax = sv.bar(genres, x="genre", y="streams", sort="desc", highlight="Pop",
+            title="Streams by genre")
 
-ax.figure.savefig("boxplot_sections.png")   # ax is a normal matplotlib Axes
+# Line: multiple series use the categorical palette and label directly.
+listeners = pd.read_csv("data/monthly_listeners.csv")
+ax = sv.line(listeners, x="month", title="Monthly listeners (millions)")
+
+# Scatter: size scales by area; color by a continuous feature (viridis).
+tracks = pd.read_csv("data/tracks.csv")
+ax = sv.scatter(tracks, x="energy", y="danceability",
+                size="popularity", color="popularity")
+
+# Every helper returns a normal matplotlib Axes.
+sv.savefig(ax.figure, "chart.png")   # saves preserving the dark background
 ```
 
-![Box plot of exam scores by section](examples/boxplot_sections.png)
+### The default (dark) look
 
-### Box plot from a "wide" DataFrame
+![Bar chart, dark Spotify theme](examples/bar_dark.png)
+![Line chart, dark Spotify theme](examples/line_dark.png)
 
-Pass a DataFrame with one numeric column per box — no extra arguments needed:
+### Modes and variants
+
+One argument switches mode or theme — the color identity and honesty rules stay
+the same:
 
 ```python
-import pandas as pd
-import cleanplot as cp
-
-df = pd.DataFrame({"control": [...], "treatment": [...]})
-ax = cp.boxplot(df)          # one box per column, labeled by column name
+sv.bar(genres, x="genre", y="streams", presentation=True)   # report/slide mode
+sv.bar(genres, x="genre", y="streams", theme="light")       # light print variant
 ```
 
-### Chinese / non-Latin labels
+| | Analytical (default) | Presentation (`presentation=True`) |
+| --- | --- | --- |
+| **Dark** (default) | everyday data viz | slides / reports (larger, 16:9) |
+| **Light** (`theme="light"`) | print / journal | light slides |
 
-No extra setup — Chinese column names, titles, and categories just render:
+### Theming your own matplotlib code
 
-```python
-import pandas as pd
-import cleanplot as cp
-
-df = pd.DataFrame({"班级": [...], "考试成绩": [...]})
-ax = cp.boxplot(df, column="考试成绩", by="班级", title="各班级考试成绩分布")
-```
-
-The theme lists common CJK fonts across macOS / Windows / Linux (PingFang SC,
-Microsoft YaHei, WenQuanYi Zen Hei, Noto Sans CJK, …) and uses the first one
-installed, so this works out of the box on a typical system.
-
-### Applying the theme to your own matplotlib code
-
-The theme isn't only for cleanplot's helpers. Use it three ways:
+The theme is also available for plain matplotlib, as a named style, a scoped
+context, or a global opt-in:
 
 ```python
 import matplotlib.pyplot as plt
-import cleanplot as cp   # importing registers the "cleanplot" style
+import spotviz as sv                     # importing registers the styles
 
-# 1) The plain-matplotlib way — apply the named style.
-plt.style.use("cleanplot")
-
-# 2) Scoped: only this block is themed.
-with cp.style_context():
-    fig, ax = plt.subplots()
-    ax.plot([0, 1, 2], [0, 1, 4])
-
-# 3) Globally for a whole script (reversible via matplotlib.rcdefaults()).
-cp.apply_style()
+plt.style.use("spotify-dark")            # or spotify-light / *-report
+with sv.theme_context("dark"):
+    ...
+sv.apply_theme("dark")                   # global; reversible via plt.rcdefaults()
 ```
-
-The theme itself is a plain matplotlib style sheet
-(`src/cleanplot/cleanplot.mplstyle`), so it's easy to read and tweak.
-
-### Themes
-
-Two themes ship with cleanplot:
-
-| Theme | Look | `plt.style.use(...)` | Palette |
-| --- | --- | --- | --- |
-| `"cleanplot"` (default) | Clean, minimal, colorblind-safe | `"cleanplot"` | Okabe-Ito |
-| `"chinese"` (中国风) | Traditional ink-and-paper aesthetic | `"cleanplot-chinese"` | Traditional Chinese colors, china-red accent |
-
-Pick a theme per chart with `theme=`, or apply one globally:
-
-```python
-import cleanplot as cp
-
-# Per-chart: warm rice-paper background, ink type, china-red accent.
-ax = cp.boxplot(df, column="score", by="section",
-                theme="chinese", highlight="Section C")
-
-# Or globally, the plain-matplotlib way:
-import matplotlib.pyplot as plt
-plt.style.use("cleanplot-chinese")
-```
-
-The `"chinese"` theme keeps the same data-ink discipline as the default (no
-top/right spines, light grid, legible type) — only the palette and surfaces
-change: a warm 宣纸 (rice-paper) background, 墨 (ink) text, and a color cycle of
-traditional Chinese colors (中国红 · 靛青 · 竹青 · 藤黄 · 黛紫 · 赭石 · 天青 · 墨).
-
-![Chinese theme box plot](examples/theme_chinese.png)
-
-See `examples/theme_demo.py` for the default-vs-chinese comparison that produced
-this.
 
 ## API (MVP)
 
 | Function | Purpose |
 | --- | --- |
-| `boxplot(data, column=None, by=None, *, ax=None, theme="cleanplot", orient=..., highlight=..., ...)` | Self-labeling box plot from a DataFrame/Series; returns `Axes`. |
-| `plt.style.use("cleanplot" \| "cleanplot-chinese")` | Apply a theme the plain-matplotlib way (registered on import). |
-| `apply_style(name="cleanplot", overrides=None)` | Apply a theme to global matplotlib rcParams. |
-| `style_context(name="cleanplot", overrides=None)` | Context manager applying a theme temporarily. |
-| `STYLE_PATH` | Path to the shipped `cleanplot.mplstyle` style sheet. |
-| `categorical(n=None)` | The colorblind-safe categorical palette (cycled to `n`). |
-| `RC_PARAMS` | The theme as a plain rcParams dict, for inspection/tweaking. |
+| `bar(data, x=None, y=None, *, theme="dark", presentation=False, highlight=None, sort=None, orient="vertical", ...)` | Single-series bar chart; green resting / green accent on `highlight`. |
+| `line(data, x=None, y=None, *, highlight=None, direct_label=True, ...)` | Multi-series line chart; categorical palette + direct labels. |
+| `scatter(data, x, y, *, size=None, color=None, ...)` | Scatter; area-scaled sizes, viridis for continuous color. |
+| `apply_theme(theme="dark", presentation=False)` | Apply the theme to global rcParams. |
+| `theme_context(theme="dark", presentation=False)` | Context manager applying the theme temporarily. |
+| `plt.style.use("spotify-dark" \| "spotify-light" \| ...)` | Named styles (registered on import). |
+| `savefig(fig, path)` | Save preserving the themed background. |
 
 ## Project layout
 
 ```
 msds610_viz/
-├── src/cleanplot/        # the library
+├── src/spotviz/
 │   ├── __init__.py       # public API
-│   ├── cleanplot.mplstyle # default theme as a matplotlib style sheet
-│   ├── chinese.mplstyle  # "chinese" theme (ink-and-paper aesthetic)
-│   ├── theme.py          # loads + registers themes; style helpers
-│   ├── palette.py        # colorblind-safe palette
-│   └── boxplot.py        # the boxplot helper
+│   ├── palette.py        # Spotify colors + categorical palette
+│   ├── theme.py          # rcParams themes + named styles
+│   ├── _core.py          # shared theming/finalize helpers
+│   ├── bar.py
+│   ├── line.py
+│   └── scatter.py
 ├── data/
-│   ├── generate_data.py  # reproducible sample-data generator (pandas + stdlib)
-│   └── section_scores.csv
+│   ├── generate_data.py  # reproducible sample data (pandas + stdlib)
+│   ├── genre_streams.csv
+│   ├── monthly_listeners.csv
+│   └── tracks.csv
 ├── examples/
-│   └── boxplot_example.py
+│   └── demo.py
 ├── tests/
-│   └── test_boxplot.py
+│   └── test_spotviz.py
 ├── pyproject.toml
 └── README.md
 ```
@@ -195,15 +142,10 @@ msds610_viz/
 
 ```bash
 pip install -e .
-python data/generate_data.py      # regenerate the sample dataset
-python examples/boxplot_example.py
-python -m pytest                  # or: python tests/test_boxplot.py
+python data/generate_data.py     # regenerate sample data
+python examples/demo.py          # render the example charts
+python -m pytest                 # or: python tests/test_spotviz.py
 ```
-
-## Status
-
-Early MVP. The box plot is the first polished helper; bar/line/scatter are the
-planned next additions. The API and defaults may still change.
 
 ## License
 

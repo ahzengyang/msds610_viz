@@ -1,15 +1,15 @@
-"""Generate a small, reproducible sample dataset for the cleanplot examples.
+"""Generate small, reproducible Spotify-flavored datasets for the examples.
 
-Uses only pandas and the Python standard library (``random``), consistent with
-the project's pandas + matplotlib dependency constraint (no numpy import).
+Uses only pandas and the Python standard library (``random``), matching the
+project's pandas + matplotlib dependency constraint (no numpy import).
 
-The dataset is exam scores for students across four course sections. Each
-section has a different underlying score distribution, which makes it a good
-fit for a box plot (comparing distributions across categories).
+Writes three CSVs into ``data/``:
 
-Run directly to (re)write ``data/section_scores.csv``:
+* ``genre_streams.csv``    — streams by genre           (bar)
+* ``monthly_listeners.csv``— monthly listeners per artist (line, multi-series)
+* ``tracks.csv``           — audio features per track    (scatter)
 
-    python data/generate_data.py
+Run directly:  python data/generate_data.py
 """
 
 import random
@@ -17,34 +17,59 @@ from pathlib import Path
 
 import pandas as pd
 
-# Per-section (mean, standard deviation, n students). Distinct centers and
-# spreads so the box plot has something to show.
-SECTIONS = {
-    "Section A": (82.0, 6.0, 40),
-    "Section B": (75.0, 11.0, 38),
-    "Section C": (88.0, 4.5, 42),
-    "Section D": (70.0, 14.0, 36),
-}
+HERE = Path(__file__).parent
 
 
-def make_scores(seed=610):
-    """Return a long-format DataFrame with columns ['section', 'score']."""
+def genre_streams(seed=1):
+    rng = random.Random(seed)
+    genres = ["Pop", "Hip-Hop", "Rock", "Latin", "EDM", "R&B", "Indie", "Jazz"]
+    base = {"Pop": 9.2, "Hip-Hop": 8.1, "Rock": 5.6, "Latin": 6.8,
+            "EDM": 4.3, "R&B": 3.9, "Indie": 2.7, "Jazz": 1.4}
+    rows = [{"genre": g,
+             "streams": round(base[g] * 1e9 * rng.uniform(0.9, 1.1))}
+            for g in genres]
+    return pd.DataFrame(rows)
+
+
+def monthly_listeners(seed=2):
+    rng = random.Random(seed)
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    artists = {"Aurora Skye": 18.0, "The Night Owls": 12.5,
+               "DJ Marisol": 9.0, "Kite String": 6.5}
+    data = {"month": months}
+    for artist, start in artists.items():
+        val = start
+        series = []
+        for _ in months:
+            val = max(1.0, val * rng.uniform(0.97, 1.12))
+            series.append(round(val, 2))
+        data[artist] = series  # millions of monthly listeners
+    return pd.DataFrame(data)
+
+
+def tracks(seed=3):
     rng = random.Random(seed)
     rows = []
-    for section, (mean, sd, n) in SECTIONS.items():
-        for _ in range(n):
-            # Clamp to a plausible 0-100 exam range.
-            score = min(100.0, max(0.0, rng.gauss(mean, sd)))
-            rows.append({"section": section, "score": round(score, 1)})
+    for i in range(80):
+        energy = rng.uniform(0.2, 0.98)
+        # danceability loosely correlated with energy
+        dance = min(0.99, max(0.1, 0.35 + 0.5 * energy + rng.uniform(-0.2, 0.2)))
+        popularity = int(max(1, min(100, 30 + 60 * energy + rng.gauss(0, 12))))
+        rows.append({
+            "track": f"Track {i + 1:02d}",
+            "energy": round(energy, 3),
+            "danceability": round(dance, 3),
+            "popularity": popularity,
+        })
     return pd.DataFrame(rows)
 
 
 def main():
-    df = make_scores()
-    out = Path(__file__).parent / "section_scores.csv"
-    df.to_csv(out, index=False)
-    print(f"Wrote {len(df)} rows to {out}")
-    print(df.groupby("section")["score"].describe()[["mean", "min", "max"]])
+    genre_streams().to_csv(HERE / "genre_streams.csv", index=False)
+    monthly_listeners().to_csv(HERE / "monthly_listeners.csv", index=False)
+    tracks().to_csv(HERE / "tracks.csv", index=False)
+    print("Wrote genre_streams.csv, monthly_listeners.csv, tracks.csv")
 
 
 if __name__ == "__main__":

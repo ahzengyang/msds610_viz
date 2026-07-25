@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cleanplot"
+name = "spotviz"
 version = "0.1.0"
-description = "Clean, honest matplotlib charts from pandas, by default."
+description = "Clean, on-brand (Spotify-themed) matplotlib charts from pandas, by default."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "ahzengyang" }]
-keywords = ["matplotlib", "pandas", "visualization", "charts", "theme"]
+keywords = ["matplotlib", "pandas", "visualization", "charts", "theme", "spotify"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -28,6 +28,3 @@ Repository = "https://github.com/ahzengyang/msds610_viz"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.package-data]
-cleanplot = ["*.mplstyle"]
