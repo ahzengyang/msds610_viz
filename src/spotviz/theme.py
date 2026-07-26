@@ -1,12 +1,12 @@
 """spotviz themes as matplotlib rcParams / named styles.
 
 The chart helpers style their own output directly, but this module lets you
-apply the Spotify look to *any* matplotlib code — via a context manager, a
+apply the signature look to *any* matplotlib code — via a context manager, a
 global opt-in, or a named style:
 
     import spotviz
     import matplotlib.pyplot as plt
-    plt.style.use("spotify-dark")          # or "spotify-light"
+    plt.style.use("spotviz-dark")          # or "spotviz-light"
 
     with spotviz.theme_context("dark"):    # scoped
         ...
@@ -75,10 +75,10 @@ def rc_params(theme="dark", presentation=False):
 
 # Register named styles for plt.style.use(...).
 _REGISTERED = {
-    "spotify-dark": rc_params("dark", False),
-    "spotify-light": rc_params("light", False),
-    "spotify-dark-report": rc_params("dark", True),
-    "spotify-light-report": rc_params("light", True),
+    "spotviz-dark": rc_params("dark", False),
+    "spotviz-light": rc_params("light", False),
+    "spotviz-dark-report": rc_params("dark", True),
+    "spotviz-light-report": rc_params("light", True),
 }
 
 
@@ -100,7 +100,7 @@ THEMES = ("dark", "light")
 
 
 def theme_context(theme="dark", presentation=False, overrides=None):
-    """Context manager applying the Spotify theme to plain matplotlib code."""
+    """Context manager applying the signature theme to plain matplotlib code."""
     params = rc_params(theme, presentation)
     if overrides:
         params.update(overrides)
@@ -108,7 +108,7 @@ def theme_context(theme="dark", presentation=False, overrides=None):
 
 
 def apply_theme(theme="dark", presentation=False, overrides=None):
-    """Apply the Spotify theme globally (reversible via ``matplotlib.rcdefaults()``)."""
+    """Apply the signature theme globally (reversible via ``matplotlib.rcdefaults()``)."""
     mpl.rcParams.update(rc_params(theme, presentation))
     if overrides:
         mpl.rcParams.update(overrides)

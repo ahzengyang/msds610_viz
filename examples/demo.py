@@ -1,4 +1,4 @@
-"""spotviz demo — bar, line, and scatter across the Spotify themes.
+"""spotviz demo — bar, line, and scatter across the dark & light themes.
 
 Run from the project root (after ``pip install -e .``):
 

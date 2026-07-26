@@ -1,6 +1,6 @@
 """The ``line`` helper — trends over an ordered x, with direct labeling.
 
-One series is drawn in Spotify Green (the resting look). Multiple series use the
+One series is drawn in the signature green (the resting look). Multiple series use the
 categorical palette (green stays reserved), and — when there are only a few —
 each line is labeled directly at its end instead of in a legend box, which is
 easier to read. Pass ``highlight=`` to emphasize one series in green and mute
@@ -48,7 +48,7 @@ def line(
     highlight : str, optional
         Series name to emphasize in green; the rest go muted gray.
     accent : str, optional
-        Override the accent color. Defaults to Spotify Green.
+        Override the accent color. Defaults to the signature green.
     direct_label : bool, default True
         Label each series at its end instead of drawing a legend (used when
         there are at most 6 series).

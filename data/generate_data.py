@@ -1,4 +1,4 @@
-"""Generate small, reproducible Spotify-flavored datasets for the examples.
+"""Generate small, reproducible music-streaming-flavored datasets for the examples.
 
 Uses only pandas and the Python standard library (``random``), matching the
 project's pandas + matplotlib dependency constraint (no numpy import).

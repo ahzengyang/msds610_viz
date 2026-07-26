@@ -1,18 +1,19 @@
 # spotviz
 
-**Clean, on-brand matplotlib charts from pandas — Spotify-themed, by default.**
+**Clean, on-brand matplotlib charts from pandas — a bold dark theme, by default.**
 
 `spotviz` is a thin wrapper over [pandas](https://pandas.pydata.org/) and
 [matplotlib](https://matplotlib.org/). Call one simple function on your
-DataFrame and get a chart with the recognizable Spotify look — a dark
-`#121212` ground, Spotify Green as the single accent, decluttered and
+DataFrame and get a chart with a bold, modern dark look — a dark
+`#121212` ground, a signature green (`#1DB954`) as the single accent, decluttered and
 honest — without configuring anything. Every helper auto-labels from your
 DataFrame and returns the matplotlib `Axes` so you can keep customizing.
 
 Its only dependencies are **pandas** and **matplotlib**.
 
-> An independent, educational project (USF MSDS610). Not affiliated with or
-> endorsed by Spotify; it simply uses Spotify's public brand colors as a theme.
+> An independent, educational project (USF MSDS610). Its dark theme and green
+> accent are inspired by the look of modern music-streaming apps; it is not
+> affiliated with or endorsed by any company.
 
 ## Why these defaults
 
@@ -20,8 +21,8 @@ The defaults encode what data-viz research finds most impactful — viewers judg
 a chart in ~500ms mostly on **color** and **visual complexity** — so the effort
 order is **color → declutter → typography → helpers**:
 
-- **Dark Spotify identity by default** — `#121212` ground, white/gray text,
-  Spotify Green (`#1DB954`) as the *one* accent against muted grays.
+- **Bold dark identity by default** — `#121212` ground, white/gray text,
+  the signature green (`#1DB954`) as the *one* accent against muted grays.
 - **Green means emphasis.** Single-series charts rest in green; add
   `highlight=` and the rest go gray so green marks the thing that matters.
   Multi-series charts use a separate **colorblind-checked categorical palette**
@@ -74,8 +75,8 @@ sv.savefig(ax.figure, "chart.png")   # saves preserving the dark background
 
 ### The default (dark) look
 
-![Bar chart, dark Spotify theme](examples/bar_dark.png)
-![Line chart, dark Spotify theme](examples/line_dark.png)
+![Bar chart, dark theme](examples/bar_dark.png)
+![Line chart, dark theme](examples/line_dark.png)
 
 ### Modes and variants
 
@@ -101,7 +102,7 @@ context, or a global opt-in:
 import matplotlib.pyplot as plt
 import spotviz as sv                     # importing registers the styles
 
-plt.style.use("spotify-dark")            # or spotify-light / *-report
+plt.style.use("spotviz-dark")            # or spotviz-light / *-report
 with sv.theme_context("dark"):
     ...
 sv.apply_theme("dark")                   # global; reversible via plt.rcdefaults()
@@ -116,7 +117,7 @@ sv.apply_theme("dark")                   # global; reversible via plt.rcdefaults
 | `scatter(data, x, y, *, size=None, color=None, ...)` | Scatter; area-scaled sizes, viridis for continuous color. |
 | `apply_theme(theme="dark", presentation=False)` | Apply the theme to global rcParams. |
 | `theme_context(theme="dark", presentation=False)` | Context manager applying the theme temporarily. |
-| `plt.style.use("spotify-dark" \| "spotify-light" \| ...)` | Named styles (registered on import). |
+| `plt.style.use("spotviz-dark" \| "spotviz-light" \| ...)` | Named styles (registered on import). |
 | `savefig(fig, path)` | Save preserving the themed background. |
 
 ## Accessibility
@@ -137,7 +138,7 @@ by hue alone.
 msds610_viz/
 ├── src/spotviz/
 │   ├── __init__.py       # public API
-│   ├── palette.py        # Spotify colors + categorical palette
+│   ├── palette.py        # brand colors + categorical palette
 │   ├── theme.py          # rcParams themes + named styles
 │   ├── _core.py          # shared theming/finalize helpers
 │   ├── bar.py

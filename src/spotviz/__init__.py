@@ -1,6 +1,6 @@
-"""spotviz — clean, on-brand (Spotify-themed) charts from pandas.
+"""spotviz — clean, on-brand charts from pandas.
 
-A thin wrapper over pandas + matplotlib. Dark Spotify theme by default, Spotify
+A thin wrapper over pandas + matplotlib. Dark theme by default, a signature
 Green as the single accent, and polished bar/line/scatter helpers that
 auto-label from your DataFrame and return the matplotlib ``Axes``.
 

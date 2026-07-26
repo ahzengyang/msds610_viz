@@ -1,7 +1,7 @@
 """The ``bar`` helper — a single-series bar chart, on-brand by default.
 
 Bars encode with length from a zero baseline (accurate + honest). By default
-every bar is Spotify Green — the resting brand look. Pass ``highlight=`` to get
+every bar is the signature green — the resting brand look. Pass ``highlight=`` to get
 the signature "one accent against muted grays" pattern: the chosen bar stays
 green and the rest go muted gray.
 """
@@ -42,13 +42,13 @@ def bar(
     ax : matplotlib.axes.Axes, optional
         Axes to draw into; a new themed figure is created if omitted.
     theme : {"dark", "light"}, default "dark"
-        Spotify dark (default) or the light print variant.
+        Dark (default) or the light print variant.
     presentation : bool, default False
         Report/slide mode: larger type, 16:9, crisper.
     highlight : str or int, optional
         A category label or index to emphasize in green while the rest go gray.
     accent : str, optional
-        Override the accent (highlight) color. Defaults to Spotify Green.
+        Override the accent (highlight) color. Defaults to the signature green.
     color : str, optional
         Override the color of the non-highlighted bars.
     orient : {"vertical", "horizontal"}, default "vertical"

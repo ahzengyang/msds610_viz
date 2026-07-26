@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "spotviz"
 version = "0.1.0"
-description = "Clean, on-brand (Spotify-themed) matplotlib charts from pandas, by default."
+description = "Clean, on-brand matplotlib charts from pandas, with a bold dark theme by default."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "ahzengyang" }]
-keywords = ["matplotlib", "pandas", "visualization", "charts", "theme", "spotify"]
+keywords = ["matplotlib", "pandas", "visualization", "charts", "theme", "dark-theme"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",

@@ -1,6 +1,6 @@
 """The ``scatter`` helper — position encoding, with honest area-scaled sizes.
 
-Points are Spotify Green by default. When you map a column to marker size, the
+Points are the signature green by default. When you map a column to marker size, the
 value is scaled by **area** (matplotlib's ``s`` is area in points^2), not
 radius, so magnitudes aren't visually exaggerated — you can't get this wrong.
 Optionally color by a continuous column using viridis.
@@ -46,12 +46,12 @@ def scatter(
         not exaggerated.
     color : str, optional
         Column mapped to a continuous viridis color. If omitted, points are
-        Spotify Green.
+        the signature green.
     ax : matplotlib.axes.Axes, optional
     theme : {"dark", "light"}, default "dark"
     presentation : bool, default False
     accent : str, optional
-        Override the point color (single-color case). Defaults to Spotify Green.
+        Override the point color (single-color case). Defaults to the signature green.
     alpha : float, default 0.85
     title : str, optional
     colorbar : bool, default True

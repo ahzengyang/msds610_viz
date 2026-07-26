@@ -19,7 +19,7 @@ THEME = {
         "bg": APP_BG,          # #121212 near-black app background
         "surface": BLACK,      # #191414 alternate surface
         "text": WHITE,         # titles / primary text
-        "subtext": "#B3B3B3",  # Spotify "essential gray" — ticks, axis labels
+        "subtext": "#B3B3B3",  # neutral "essential gray" — ticks, axis labels
         "muted": "#6B6B6B",    # de-emphasized marks (WCAG >=3:1 on near-black)
         "grid": "#2A2A2A",     # subtle low-contrast gridlines
         "spine": "#404040",    # baseline / axis line

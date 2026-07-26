@@ -48,8 +48,8 @@ def test_green_reserved_not_in_categorical():
 
 
 def test_named_styles_registered():
-    for name in ("spotify-dark", "spotify-light",
-                 "spotify-dark-report", "spotify-light-report"):
+    for name in ("spotviz-dark", "spotviz-light",
+                 "spotviz-dark-report", "spotviz-light-report"):
         assert name in plt.style.available
 
 

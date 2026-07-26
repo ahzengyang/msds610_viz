@@ -1,8 +1,8 @@
-"""Spotify color system for spotviz.
+"""Color system for spotviz.
 
 The brand colors and the categorical palette that give the library its visual
-identity. Spotify Green is reserved as the single *accent* color and is
-deliberately kept out of the categorical palette, per Spotify's brand rule that
+identity. the signature green is reserved as the single *accent* color and is
+deliberately kept out of the categorical palette, per the brand rule that
 green should not be combined with other brand-palette colors.
 """
 
@@ -20,7 +20,7 @@ ACCENT = GREEN
 # Vivid but distinct, and CVD-tuned: verified with a colorblindness simulation
 # (Machado 2009 + CIELAB ΔE, see tools/check_cvd.py) to keep every pair clearly
 # separable under deuteranopia, protanopia, and tritanopia — minimum pairwise
-# ΔE ≈ 21 across all three. Spotify Green is intentionally NOT here: green stays
+# ΔE ≈ 21 across all three. the signature green is intentionally NOT here: green stays
 # reserved for the accent, so it keeps its meaning and never competes as
 # "category 3".
 CATEGORICAL = [
