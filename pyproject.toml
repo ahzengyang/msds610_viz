@@ -22,9 +22,16 @@ dependencies = [
     "matplotlib>=3.5",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest", "build", "twine"]
+
 [project.urls]
 Homepage = "https://github.com/ahzengyang/msds610_viz"
 Repository = "https://github.com/ahzengyang/msds610_viz"
+Issues = "https://github.com/ahzengyang/msds610_viz/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools]
+license-files = ["LICENSE"]

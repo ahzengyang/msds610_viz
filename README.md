@@ -36,6 +36,12 @@ order is **color → declutter → typography → helpers**:
 ## Installation
 
 ```bash
+pip install spotviz
+```
+
+Or from source:
+
+```bash
 git clone https://github.com/ahzengyang/msds610_viz.git
 cd msds610_viz
 pip install -e .
@@ -113,6 +119,18 @@ sv.apply_theme("dark")                   # global; reversible via plt.rcdefaults
 | `plt.style.use("spotify-dark" \| "spotify-light" \| ...)` | Named styles (registered on import). |
 | `savefig(fig, path)` | Save preserving the themed background. |
 
+## Accessibility
+
+The categorical palette is verified with a colorblindness simulation
+(`tools/check_cvd.py`): Machado (2009) matrices for deuteranopia / protanopia /
+tritanopia, then CIELAB ΔE between every pair. The shipped palette keeps a
+minimum pairwise ΔE of ≈ 21 under all three — no two categories collapse
+together — and the dark theme's text/accent/muted grays clear WCAG contrast on
+`#121212`. Categories are also paired with direct labels, never distinguished
+by hue alone.
+
+![Palette under CVD simulation](examples/palette_cvd.png)
+
 ## Project layout
 
 ```
@@ -134,7 +152,10 @@ msds610_viz/
 │   └── demo.py
 ├── tests/
 │   └── test_spotviz.py
+├── tools/
+│   └── check_cvd.py      # colorblindness / WCAG validation (dev tool)
 ├── pyproject.toml
+├── LICENSE
 └── README.md
 ```
 

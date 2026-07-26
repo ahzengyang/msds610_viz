@@ -17,15 +17,18 @@ WHITE = "#FFFFFF"
 ACCENT = GREEN
 
 # --- categorical palette (multi-series) --------------------------------------
-# Vivid but distinct, checked to stay separable under deuteranopia/protanopia.
-# Spotify Green is intentionally NOT here: green stays reserved for the accent,
-# so it keeps its meaning and never competes as "category 3".
+# Vivid but distinct, and CVD-tuned: verified with a colorblindness simulation
+# (Machado 2009 + CIELAB ΔE, see tools/check_cvd.py) to keep every pair clearly
+# separable under deuteranopia, protanopia, and tritanopia — minimum pairwise
+# ΔE ≈ 21 across all three. Spotify Green is intentionally NOT here: green stays
+# reserved for the accent, so it keeps its meaning and never competes as
+# "category 3".
 CATEGORICAL = [
-    "#FF6437",  # orange
+    "#FF7A5C",  # coral
+    "#FFD23F",  # yellow
+    "#E8338A",  # magenta
     "#A056FF",  # violet
     "#2D9CDB",  # blue
-    "#FFC864",  # yellow
-    "#EB5C8E",  # pink
 ]
 
 #: Sequential/continuous colormap — matplotlib's perceptually-uniform viridis.

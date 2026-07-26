@@ -131,14 +131,47 @@ def line(
 
 
 def _direct_labels(ax, xvals, series, colors, presentation):
-    """Place each series' name at its right end, colored to match the line."""
+    """Label each series at its right end, nudged apart so they don't collide.
+
+    End y-values are sorted and pushed upward to keep a minimum vertical gap;
+    the y-limit is extended if the stack needs it. When a label is moved off its
+    line's true endpoint, a thin leader line connects the two.
+    """
     size = 13 if presentation else 10.5
-    x_last = xvals[-1]
-    for name, yvals in series:
+    x_last = xvals[-1] if not isinstance(xvals[-1], str) else len(xvals) - 1
+
+    ymin, ymax = ax.get_ylim()
+    rng = (ymax - ymin) or 1.0
+    min_gap = 0.052 * rng * (size / 10.5)  # minimum spacing between labels
+
+    ends = sorted(((yvals[-1], name) for name, yvals in series),
+                  key=lambda t: t[0])
+    placed = []
+    for y, name in ends:
+        if placed and y - placed[-1][0] < min_gap:
+            y = placed[-1][0] + min_gap
+        placed.append((y, name))
+
+    # Make room if the pushed-up stack overflows the top.
+    top = placed[-1][0] if placed else ymax
+    if top > ymax:
+        ax.set_ylim(ymin, top + 0.03 * rng)
+
+    label_y = {name: y for y, name in placed}
+    y_end = {name: yvals[-1] for name, yvals in series}
+    xr = (max(_as_num(xvals)) - min(_as_num(xvals))) or 1.0
+    pad = 0.02 * xr
+
+    for name in label_y:
+        ly, ye = label_y[name], y_end[name]
+        if abs(ly - ye) > 1e-9:  # moved -> draw a thin leader
+            ax.plot([x_last, x_last + pad], [ye, ly],
+                    color=colors[name], linewidth=0.9, alpha=0.55,
+                    zorder=1, solid_capstyle="round")
         ax.annotate(
             f" {name}",
-            xy=(x_last, yvals[-1]),
-            xytext=(4, 0),
+            xy=(x_last + pad, ly),
+            xytext=(3, 0),
             textcoords="offset points",
             va="center",
             ha="left",
@@ -147,4 +180,11 @@ def _direct_labels(ax, xvals, series, colors, presentation):
             fontweight="bold",
         )
     # Give the labels room on the right.
-    ax.margins(x=0.12)
+    ax.margins(x=0.14)
+
+
+def _as_num(xvals):
+    """x positions as numbers (categorical strings map to 0..n-1)."""
+    if len(xvals) and isinstance(xvals[-1], str):
+        return list(range(len(xvals)))
+    return list(xvals)
