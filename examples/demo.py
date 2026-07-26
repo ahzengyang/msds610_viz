@@ -26,40 +26,46 @@ def main():
 
     # 1) Bar (dark, default): highlight one category in green, rest muted.
     ax = sv.bar(genres, x="genre", y="streams_bn", sort="desc",
-                highlight="Pop", title="Streams by genre (billions)")
+                highlight="Pop", title="Streams by genre",
+                ylabel="Streams (billions)")
     sv.savefig(ax.figure, HERE / "bar_dark.png")
     plt.close(ax.figure)
 
     # 2) Bar (report/presentation): horizontal, sorted, value labels.
     ax = sv.bar(genres, x="genre", y="streams_bn", sort="desc",
                 orient="horizontal", presentation=True,
-                highlight="Pop", title="Streams by genre (billions)")
+                highlight="Pop", title="Streams by genre",
+                xlabel="Streams (billions)")
     sv.savefig(ax.figure, HERE / "bar_report.png")
     plt.close(ax.figure)
 
     # 3) Line (dark): multi-series with the categorical palette + direct labels.
     ax = sv.line(listeners, x="month",
-                 title="Monthly listeners (millions)")
+                 title="Monthly listeners",
+                 xlabel="Month", ylabel="Listeners (millions)")
     sv.savefig(ax.figure, HERE / "line_dark.png")
     plt.close(ax.figure)
 
     # 4) Line (dark): emphasize one series in green, mute the rest.
     ax = sv.line(listeners, x="month", highlight="Aurora Skye",
-                 title="Monthly listeners — Aurora Skye leads")
+                 title="Monthly listeners — Aurora Skye leads",
+                 xlabel="Month", ylabel="Listeners (millions)")
     sv.savefig(ax.figure, HERE / "line_highlight.png")
     plt.close(ax.figure)
 
     # 5) Scatter (dark): size by area, color by a continuous feature (viridis).
     ax = sv.scatter(tracks, x="energy", y="danceability",
                     size="popularity", color="popularity",
-                    title="Audio features (size & color = popularity)")
+                    title="Audio features (size & color = popularity)",
+                    xlabel="Energy", ylabel="Danceability")
     sv.savefig(ax.figure, HERE / "scatter_dark.png")
     plt.close(ax.figure)
 
     # 6) Light variant: same bar, one argument away.
     ax = sv.bar(genres, x="genre", y="streams_bn", sort="desc",
                 theme="light", highlight="Pop",
-                title="Streams by genre (billions) — light theme")
+                title="Streams by genre — light theme",
+                ylabel="Streams (billions)")
     sv.savefig(ax.figure, HERE / "bar_light.png")
     plt.close(ax.figure)
 

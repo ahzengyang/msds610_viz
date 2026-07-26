@@ -26,6 +26,8 @@ def line(
     accent=None,
     direct_label=True,
     title=None,
+    xlabel=None,
+    ylabel=None,
     **kwargs,
 ):
     """Draw a clean, on-brand line chart from a DataFrame.
@@ -61,14 +63,14 @@ def line(
     if isinstance(data, pd.Series):
         xvals = list(data.index)
         series = [(str(data.name or "value"), data.to_numpy())]
-        xlabel = str(data.index.name or "")
+        x_auto = str(data.index.name or "")
     elif isinstance(data, pd.DataFrame):
         if x is not None:
             xvals = data[x].to_numpy()
-            xlabel = str(x)
+            x_auto = str(x)
         else:
             xvals = list(data.index)
-            xlabel = str(data.index.name or "")
+            x_auto = str(data.index.name or "")
         if y is None:
             cols = [c for c in data.select_dtypes("number").columns if c != x]
         else:
@@ -108,7 +110,11 @@ def line(
         ax.plot(xvals, yvals, color=colors[name], linewidth=s["linewidth"],
                 solid_capstyle="round", zorder=z[name], **kwargs)
 
-    ax.set_xlabel(xlabel)
+    ax.set_xlabel(x_auto)
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
     ax.margins(x=0.02)
     finalize(ax, theme=theme, presentation=presentation, grid_axis="y",
              title=title)

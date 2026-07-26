@@ -26,6 +26,8 @@ def bar(
     sort=None,
     label_values=None,
     title=None,
+    xlabel=None,
+    ylabel=None,
     **kwargs,
 ):
     """Draw a clean, on-brand bar chart from a DataFrame or Series.
@@ -57,6 +59,8 @@ def bar(
         Draw value labels at the bar ends. Defaults to True in ``presentation``.
     title : str, optional
         Axes title (left-aligned).
+    xlabel, ylabel : str, optional
+        Override the auto axis labels (from the column names).
     **kwargs
         Passed through to matplotlib's ``bar``/``barh``.
 
@@ -67,7 +71,7 @@ def bar(
     if orient not in ("vertical", "horizontal"):
         raise ValueError("orient must be 'vertical' or 'horizontal'.")
 
-    cats, vals, xlabel, ylabel = resolve_xy(data, x, y)
+    cats, vals, x_auto, y_auto = resolve_xy(data, x, y)
     cats = [str(c) for c in cats]
     pairs = list(zip(cats, vals))
 
@@ -102,17 +106,23 @@ def bar(
         ax.bar(positions, vals, color=colors, width=0.72, **kwargs)
         ax.set_xticks(list(positions))
         ax.set_xticklabels(cats)
-        ax.set_ylabel(ylabel)
+        ax.set_ylabel(y_auto)
         ax.margins(x=0.02)
         grid_axis = "y"
     else:
         ax.barh(positions, vals, color=colors, height=0.72, **kwargs)
         ax.set_yticks(list(positions))
         ax.set_yticklabels(cats)
-        ax.set_xlabel(ylabel)
+        ax.set_xlabel(y_auto)
         ax.invert_yaxis()  # first category on top
         ax.margins(y=0.02)
         grid_axis = "x"
+
+    # Explicit label overrides win over the auto-labels from the columns.
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
 
     finalize(ax, theme=theme, presentation=presentation,
              grid_axis=grid_axis, title=title)

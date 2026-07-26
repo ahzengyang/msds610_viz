@@ -29,6 +29,8 @@ def scatter(
     accent=None,
     alpha=0.85,
     title=None,
+    xlabel=None,
+    ylabel=None,
     colorbar=True,
     **kwargs,
 ):
@@ -94,8 +96,8 @@ def scatter(
         ax.scatter(xvals, yvals, s=s_area, color=point, alpha=alpha,
                    edgecolors="none", **kwargs)
 
-    ax.set_xlabel(str(x))
-    ax.set_ylabel(str(y))
+    ax.set_xlabel(xlabel if xlabel is not None else str(x))
+    ax.set_ylabel(ylabel if ylabel is not None else str(y))
     # Scatter reads best with no grid (or a faint one); default to none.
     finalize(ax, theme=theme, presentation=presentation, grid_axis=None,
              title=title)
