@@ -169,6 +169,26 @@ python examples/demo.py          # render the example charts
 python -m pytest                 # or: python tests/test_spotviz.py
 ```
 
+## Publishing
+
+Releasing to [PyPI](https://pypi.org/) (maintainers only). Use an up-to-date
+`build`/`twine`, and authenticate with a PyPI API token (username `__token__`).
+
+```bash
+python -m pip install --upgrade build twine
+rm -rf dist/                        # clear any stale builds
+python -m build                     # -> dist/*.tar.gz + *.whl
+python -m twine check dist/*        # must PASS for both artifacts
+
+# optional dry run on TestPyPI first
+python -m twine upload --repository testpypi dist/*
+
+python -m twine upload dist/*       # publish to PyPI
+```
+
+A version number can never be reused — bump `version` in `pyproject.toml`
+for each release.
+
 ## License
 
 MIT
