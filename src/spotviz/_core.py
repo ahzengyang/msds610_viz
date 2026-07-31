@@ -152,6 +152,18 @@ def finalize(ax, theme="dark", presentation=False, grid_axis="y", title=None):
     return ax
 
 
-def savefig(fig, path):
-    """Save preserving the themed (dark) background regardless of rcParams."""
-    fig.savefig(path, facecolor=fig.get_facecolor())
+def savefig(fig, path, **kwargs):
+    """Save preserving the themed (dark) background regardless of rcParams.
+
+    Defaults to a tight bounding box so long tick labels (e.g. horizontal-bar
+    category names) and direct-labels aren't clipped at the figure edge. Any
+    keyword is forwarded to ``Figure.savefig`` and overrides these defaults.
+    """
+    opts = {
+        "facecolor": fig.get_facecolor(),
+        "edgecolor": "none",
+        "bbox_inches": "tight",
+        "pad_inches": 0.15,
+    }
+    opts.update(kwargs)
+    fig.savefig(path, **opts)
